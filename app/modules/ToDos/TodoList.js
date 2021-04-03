@@ -1,19 +1,29 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useContext} from 'react';
 import {View, FlatList, Text} from 'react-native';
+import {connect} from 'react-redux';
+
 import {ApplicationStyles} from '../../theme';
-import styles from './Styles/ToDosStyles';
+import {AuthContext} from '../../contexts';
 import {CustomButton} from '../../components';
 import {Strings} from '../../constants';
-import {connect} from 'react-redux';
 import {getTodos, deleteTodo} from '../../redux/actions';
+import styles from './Styles/ToDosStyles';
 
-const RenderButton = ({navigation}) => (
-  <CustomButton
-    theme={Strings.primary}
-    title={Strings.addTodo}
-    containerStyle={styles.fullButton}
-    onClick={() => navigation.navigate('AddEditTodoScreen')}
-  />
+const RenderButtons = ({navigation, logout}) => (
+  <>
+    <CustomButton
+      theme={Strings.primary}
+      title={Strings.addTodo}
+      containerStyle={styles.fullButton}
+      onClick={() => navigation.navigate('AddEditTodoScreen')}
+    />
+    <CustomButton
+      theme={Strings.primary}
+      title={Strings.logout}
+      containerStyle={styles.fullButton}
+      onClick={logout}
+    />
+  </>
 );
 
 const RenderItem = ({item, todoItems, navigation, deleteTodoItem}) => {
@@ -44,6 +54,8 @@ const RenderItem = ({item, todoItems, navigation, deleteTodoItem}) => {
 };
 
 const TodoList = ({navigation, getTodoItems, deleteTodoItem, todoItems}) => {
+  const {logout} = useContext(AuthContext);
+
   useEffect(() => {
     getTodoItems();
   }, [getTodoItems]);
@@ -61,7 +73,7 @@ const TodoList = ({navigation, getTodoItems, deleteTodoItem, todoItems}) => {
           />
         )}
         keyExtractor={(item, index) => index.toString()}
-        ListFooterComponent={() => <RenderButton navigation={navigation} />}
+        ListFooterComponent={() => <RenderButtons {...{navigation, logout}} />}
       />
     </View>
   );

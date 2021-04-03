@@ -6,6 +6,7 @@ const strings = {
   delete: 'Delete',
   editTodo: 'Edit Todo',
   login: 'Login',
+  logout: 'Logout',
 };
 
 export default strings;
