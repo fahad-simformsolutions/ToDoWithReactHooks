@@ -5,6 +5,7 @@ const strings = {
   edit: 'Edit',
   delete: 'Delete',
   editTodo: 'Edit Todo',
+  login: 'Login',
 };
 
 export default strings;

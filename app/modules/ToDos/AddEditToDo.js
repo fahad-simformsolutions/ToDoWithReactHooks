@@ -1,6 +1,7 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {View} from 'react-native';
 import {ApplicationStyles} from '../../theme';
+import {AuthContext} from '../../contexts';
 import styles from './Styles/ToDosStyles';
 import {CustomButton, CustomInput} from '../../components';
 import {Strings} from '../../constants';
@@ -16,17 +17,20 @@ const AddEditToDo = ({
 }) => {
   const {editMode, todoValue} = route.params;
   const [todo, setTodo] = useState(todoValue ? todoValue : '');
+  const {username} = useContext(AuthContext);
   const [error, setError] = useState('');
 
   const onAddEdit = () => {
     if (todo.trim() !== '') {
-      let newTodoArray = [];
-      todoItems.map((item) => {
-        newTodoArray.push(item.toLowerCase());
-      });
+      let newTodoArray = todoItems.map((item) => ({
+        task: item,
+        addedBy: username,
+      }));
       if (
         newTodoArray.length > 0 &&
-        newTodoArray.includes(todo.toLowerCase())
+        newTodoArray.some(
+          (item) => item.task.toLowerCase() === todo.toLowerCase(),
+        )
       ) {
         setError('Already Exist, please enter another value..!!');
       } else {
@@ -47,7 +51,8 @@ const AddEditToDo = ({
         placeholder={'Enter Todo'}
         label={'Todo Item'}
         error={error}
-        onChangeText={(text) => setTodo(text)}
+        onChangeText={setTodo}
+        onSubmitEditing={onAddEdit}
       />
       <CustomButton
         theme={Strings.primary}
