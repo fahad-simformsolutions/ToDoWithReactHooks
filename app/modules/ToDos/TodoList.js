@@ -1,6 +1,6 @@
 import React, {useEffect, useContext} from 'react';
 import {View, FlatList, Text} from 'react-native';
-import {connect} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 import {ApplicationStyles} from '../../theme';
 import {AuthContext} from '../../contexts';
@@ -26,7 +26,10 @@ const RenderButtons = ({navigation, logout}) => (
   </>
 );
 
-const RenderItem = ({item, todoItems, navigation, deleteTodoItem}) => {
+const RenderItem = ({item, navigation}) => {
+  const todoItems = useSelector((state) => state.todos.todos);
+  const dispatch = useDispatch();
+
   return (
     <View style={styles.row}>
       <Text style={styles.rowText}>{item}</Text>
@@ -46,31 +49,28 @@ const RenderItem = ({item, todoItems, navigation, deleteTodoItem}) => {
           theme={Strings.secondary}
           title={Strings.delete}
           containerStyle={styles.deleteButton}
-          onClick={() => deleteTodoItem(item, todoItems)}
+          onClick={() => dispatch(deleteTodo(item, todoItems))}
         />
       </View>
     </View>
   );
 };
 
-const TodoList = ({navigation, getTodoItems, deleteTodoItem, todoItems}) => {
+const TodoList = ({navigation}) => {
+  const todoItems = useSelector((state) => state.todos.todos);
   const {logout} = useContext(AuthContext);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getTodoItems();
-  }, [getTodoItems]);
+    dispatch(getTodos);
+  }, [dispatch]);
 
   return (
     <View style={ApplicationStyles.container}>
       <FlatList
         data={todoItems}
         renderItem={({item}) => (
-          <RenderItem
-            item={item}
-            todoItems={todoItems}
-            navigation={navigation}
-            deleteTodoItem={deleteTodoItem}
-          />
+          <RenderItem item={item} navigation={navigation} />
         )}
         keyExtractor={(item, index) => index.toString()}
         ListFooterComponent={() => <RenderButtons {...{navigation, logout}} />}
@@ -79,22 +79,4 @@ const TodoList = ({navigation, getTodoItems, deleteTodoItem, todoItems}) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  console.log('state', state);
-  return {
-    todoItems: state.todos.todos,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    getTodoItems: () => {
-      dispatch(getTodos);
-    },
-    deleteTodoItem: (item, todoItems) => {
-      dispatch(deleteTodo(item, todoItems));
-    },
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(TodoList);
+export default TodoList;

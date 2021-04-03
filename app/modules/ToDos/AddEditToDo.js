@@ -5,20 +5,16 @@ import {AuthContext} from '../../contexts';
 import styles from './Styles/ToDosStyles';
 import {CustomButton, CustomInput} from '../../components';
 import {Strings} from '../../constants';
-import {connect} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {addTodo, editTodo} from '../../redux/actions';
 
-const AddEditToDo = ({
-  addTodoItem,
-  editTodoItem,
-  todoItems,
-  navigation,
-  route,
-}) => {
+const AddEditToDo = ({navigation, route}) => {
+  const todoItems = useSelector((state) => state.todos.todos);
   const {editMode, todoValue} = route.params;
   const [todo, setTodo] = useState(todoValue ? todoValue : '');
   const {username} = useContext(AuthContext);
   const [error, setError] = useState('');
+  const dispatch = useDispatch();
 
   const onAddEdit = () => {
     if (todo.trim() !== '') {
@@ -35,8 +31,8 @@ const AddEditToDo = ({
         setError('Already Exist, please enter another value..!!');
       } else {
         editMode === true
-          ? editTodoItem(todo, todoValue, todoItems)
-          : addTodoItem(todo, todoItems);
+          ? dispatch(editTodo(todo, todoValue, todoItems))
+          : dispatch(addTodo(todo, todoItems));
         navigation.goBack();
       }
     } else {
@@ -64,20 +60,4 @@ const AddEditToDo = ({
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    todoItems: state.todos.todos,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    addTodoItem: (todo, todoItems) => {
-      dispatch(addTodo(todo, todoItems));
-    },
-    editTodoItem: (todo, todoOldValue, todoItems) => {
-      dispatch(editTodo(todo, todoOldValue, todoItems));
-    },
-  };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(AddEditToDo);
+export default AddEditToDo;
