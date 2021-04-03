@@ -1,20 +1,25 @@
 import React, {useState, useContext} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {View} from 'react-native';
+
 import {ApplicationStyles} from '../../theme';
 import {AuthContext} from '../../contexts';
 import styles from './Styles/ToDosStyles';
 import {CustomButton, CustomInput} from '../../components';
 import {Strings} from '../../constants';
-import {useDispatch, useSelector} from 'react-redux';
 import {addTodo, editTodo} from '../../redux/actions';
 
-const AddEditToDo = ({navigation, route}) => {
+const AddEditToDo = () => {
   const todoItems = useSelector((state) => state.todos.todos);
-  const {editMode, todoValue} = route.params;
   const [todo, setTodo] = useState(todoValue ? todoValue : '');
   const {username} = useContext(AuthContext);
   const [error, setError] = useState('');
+  const {goBack} = useNavigation();
   const dispatch = useDispatch();
+  const {
+    params: {editMode, todoValue},
+  } = useRoute();
 
   const onAddEdit = () => {
     if (todo.trim() !== '') {
@@ -33,7 +38,7 @@ const AddEditToDo = ({navigation, route}) => {
         editMode === true
           ? dispatch(editTodo(todo, todoValue, todoItems))
           : dispatch(addTodo(todo, todoItems));
-        navigation.goBack();
+        goBack();
       }
     } else {
       setError('Required Field..!!');
